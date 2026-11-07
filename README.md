@@ -11,6 +11,7 @@ Download `ezkernelnew.bin` from [Merkin Mix releases](https://github.com/voluptu
 
 ## What Merkin Mix changes
 
+- **8.3.0:** Refined startup, menu feedback and Start-screen motion; added Auto theme, grouped artwork settings, Open SYSTEM, default wrap-around with saved preferences preserved, and Boot to. Clean list and Remember cheats remain optional. Thumbnail scale maps now reside in IWRAM.
 - Mirrored SD-card artwork lookup for multi-system libraries, with custom and built-in thumbnail fallbacks.
 - Selective transparency in marked thumbnails, including support in animated carousel frames. Enabled artwork borders use rectangular or rounded outlines.
 - Optional **Settings → Games → Remember cheats**, off by default, with localized labels (Thai uses English). Selections save when leaving the cheat editor and reload for the same game, including launch without reopening the editor. Collapsing a group preserves its selections, clamps the cursor and clears stale rows.
@@ -22,7 +23,7 @@ Download `ezkernelnew.bin` from [Merkin Mix releases](https://github.com/voluptu
 
 The **inherited DS Style interface** includes list, List + Art, horizontal and vertical carousel views; title and box artwork; themes; favourites and recent games; multilingual text; UI sounds; a text/Markdown viewer; and readable `/SYSTEM/SETTINGS.TXT` settings. Smooth carousel animation, adjustable side previews, and the launch pulse come from **FrankieT19's v7.5**, integrated into the 8.2.0 source.
 
-Host regressions and builds do not establish hardware compatibility or timing. Open audit items include failed overwrites that can lose an existing SD save, settings-file write/close failures, NOR catalog recovery, and NOR operation timing. See the [audit progress ledger](KERNEL_AUDIT_PROGRESS.md) for evidence and remaining limits.
+Host regressions and builds do not establish hardware compatibility or timing. Open audit items include failed overwrites that can lose an existing SD save, settings-file write/close failures, NOR catalog recovery, and NOR operation timing. See the [audit progress ledger](progress.md) for evidence and remaining limits.
 
 Remembered selections use `/SYSTEM/CHEATSTATE/<hash>.cs2`, with full game-path identity and a cheat-content fingerprint. Changed cheat files invalidate the snapshot; legacy `CHS1`/`.cst` files are not imported. The snapshot supports up to 128 selected options, one per section; persistence is disabled for cheat files larger than 1 MiB. Failed writes are reported, but replacement is not atomic and can lose the prior snapshot.
 
@@ -61,3 +62,5 @@ The script also uses host test tools, Node and Cppcheck; consult the script for 
 ## Credits and license
 
 Thanks to **Sterophonick**, **FrankieT19**, **exploitz86**, and **SkillerCMP** for DS Style and the related kernel contributions on which this work draws. See [CREDITS.md](CREDITS.md) for provenance and the distinction between inherited features and the 8.2.0 integration.
+
+The repository includes the [Apache License 2.0](LICENSE). Retain the individual component licenses and attribution notices.

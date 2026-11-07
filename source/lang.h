@@ -82,6 +82,10 @@ extern char* gl_error_3;
 extern char* gl_error_4;
 extern char* gl_error_5;
 extern char* gl_error_6;
+extern char* gl_nor_device_error;
+extern char* gl_nor_erase_error;
+extern char* gl_nor_program_error;
+extern char* gl_nor_catalog_error;
 
 extern char* gl_save_sav;
 extern char* gl_save_ing;

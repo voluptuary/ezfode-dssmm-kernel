@@ -4,7 +4,7 @@
 set -eu
 
 repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-ref=${1:-83e350d}
+ref=${1:-v8.2.0}
 new_src=${2:-$repo_root/source/ezkernelnew.c}
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT HUP INT TERM

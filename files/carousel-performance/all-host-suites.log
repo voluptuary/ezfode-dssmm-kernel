@@ -1,0 +1,123 @@
+
+RUN scripts/test-carousel-lookup-scaling-host.sh
+indexed N=30: complete names 0 resolver scans; clipped scan=31 returned entries
+FatFs N=30 last ordinary LFN: opens=1 reads=1 dir_find=2 dir_next=121
+FatFs N=30 missing: opens=1 reads=0 dir_find=2 dir_next=132
+indexed N=60: complete names 0 resolver scans; clipped scan=61 returned entries
+FatFs N=60 last ordinary LFN: opens=1 reads=1 dir_find=2 dir_next=242
+FatFs N=60 missing: opens=1 reads=0 dir_find=2 dir_next=253
+indexed N=90: complete names 0 resolver scans; clipped scan=91 returned entries
+FatFs N=90 last ordinary LFN: opens=1 reads=1 dir_find=2 dir_next=363
+FatFs N=90 missing: opens=1 reads=0 dir_find=2 dir_next=374
+indexed N=120: complete names 0 resolver scans; clipped scan=121 returned entries
+FatFs N=120 last ordinary LFN: opens=1 reads=1 dir_find=2 dir_next=484
+FatFs N=120 missing: opens=1 reads=0 dir_find=2 dir_next=495
+indexed N=240: complete names 0 resolver scans; clipped scan=241 returned entries
+FatFs N=240 last ordinary LFN: opens=1 reads=1 dir_find=2 dir_next=965
+FatFs N=240 missing: opens=1 reads=0 dir_find=2 dir_next=976
+Scaling evidence only: dir_next counts include LFN slots/parents, not SD latency or frame time. No per-move simulation.
+
+RUN scripts/test-carousel-motion-host.sh
+Carousel install bounds and rest-frame scenarios passed.
+
+RUN scripts/test-cheat-row-host.sh
+In file included from /workspaces/omega-de-ds-style-multisystem-kernel/tests/cheat-row-host.c:59:
+/tmp/tmp.sgmDioNkSl/cheat.impl.c: In function ‘str2hex’:
+/tmp/tmp.sgmDioNkSl/cheat.impl.c:8:18: warning: comparison of integer expressions of different signedness: ‘long unsigned int’ and ‘int’ [-Wsign-compare]
+    8 |         for(i=0;i<len;i++)
+      |                  ^
+/tmp/tmp.sgmDioNkSl/cheat.impl.c: In function ‘Analyze_KEYVAL’:
+/tmp/tmp.sgmDioNkSl/cheat.impl.c:19:26: warning: unused parameter ‘file’ [-Wunused-parameter]
+   19 | void Analyze_KEYVAL(FIL* file,u32 total)
+      |                     ~~~~~^~~~
+PASSED: an address-only row starts with an empty value buffer
+
+RUN scripts/test-cheat-state-host.sh
+PASS: cheat persistence, failures, identity, bounded selections and collapsed viewport
+
+RUN scripts/test-custom-manifest-host.sh
+manifest differential: 169620 queries, counts 0..256, ascending/reverse/duplicates/small-domain/full-width; canaries PASS
+manifest M=30: 120 misses old=3600 hash probes new=480; cold reverse-sort comparisons=138
+manifest M=60: 120 misses old=7200 hash probes new=600; cold reverse-sort comparisons=357
+manifest M=90: 120 misses old=10800 hash probes new=720; cold reverse-sort comparisons=607
+manifest M=120: 120 misses old=14400 hash probes new=720; cold reverse-sort comparisons=885
+manifest M=256: 120 misses old=30720 hash probes new=960; cold reverse-sort comparisons=2562
+production collection: cap/partial read/empty/open failure/style isolation/invalid-style fallback/warm reuse PASS
+
+RUN scripts/test-fat-table-builder-host.sh
+FAT table builder host test passed.
+
+RUN scripts/test-fatfs-long-name-host.sh
+indexed-name resolver scans: 16 files -> 17 entries; 96 files -> 97 entries; complete indexed LFNs -> 0 scans
+FatFs long-name identity scenarios passed.
+
+RUN scripts/test-kernel-size-guard-host.sh
+[1] image exactly at the limit (2097152 bytes) is accepted
+  ok    make succeeds
+  ok    out.gba kept at the limit
+[2] image one byte over the limit is rejected
+  ok    make fails
+  ok    message names the limit
+  ok    no oversized out.gba left behind
+[3] re-running make after a rejected build must not silently succeed
+  ok    second make still fails
+  ok    still no out.gba after the re-run
+[4] a comfortably small image is accepted
+  ok    make succeeds
+  ok    build reports the size
+Kernel size guard host test passed.
+
+RUN scripts/test-launcher-art-border-host.sh
+Artwork border rollback: 2160 differential cases passed
+
+RUN scripts/test-launcher-art-style-policy-host.sh
+Artwork style policy scenarios passed.
+
+RUN scripts/test-launcher-artwork-draw-host.sh
+Artwork drawing matches 83e350d: final|e4bc9c69|dma_row_copies=2650289
+span|cases=766800|mismatches=0
+
+RUN scripts/test-launcher-enum-settings-host.sh
+Enum settings readers behave identically to 83e350d over 33600 cases.
+
+RUN scripts/test-launcher-navigation-host.sh
+Launcher navigation scenarios passed.
+
+RUN scripts/test-launcher-settings-readers-host.sh
+Settings readers behave identically to 83e350d over 1275 cases.
+
+RUN scripts/test-nor-catalog-recovery-host.sh
+NOR catalog recovery transitions and legacy ranking scenarios passed.
+
+RUN scripts/test-nor-catalog-transaction-host.sh
+NOR catalog transaction scenarios passed.
+
+RUN scripts/test-nor-flash-status-host.sh
+NOR flash status scenarios passed.
+
+RUN scripts/test-nor-info-policy-host.sh
+NOR info policy host test passed.
+
+RUN scripts/test-savefile-host.sh
+[save-file creation, overwrite, and failure handling]
+  ok    missing file is the only open result that permits save creation
+  ok    missing directory is not mistaken for a missing save
+  ok    disk I/O error is not mistaken for a missing save
+  ok    successful first-time save returns success
+  ok    successful save has the requested full size
+  ok    read back the complete newly created save
+  ok    new save contents are initialized to 0xFF
+  ok    successful first-time save supports a long filename
+  ok    long-filename save is discoverable at its complete size
+  ok    full card causes first-time save creation to fail
+  ok    full-card failure leaves no partial save file
+  ok    baseline save succeeds before write-failure sweep
+  ok    save operation performs disk writes
+  ok    write-error sweep triggers SavefileWrite failures
+  ok    each injected write error leaves no discoverable partial save
+  ok    pre-existing save fixture is complete
+  ok    precondition: old LFN save exists before overwrite
+  ok    overwrite fault is injected after Save_savefile opens the old path
+  ok    failed overwrite is reported to the caller
+  ok    failed overwrite removes the replacement and leaves the previous save unavailable
+PASSED (0 failures)

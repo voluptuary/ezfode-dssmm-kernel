@@ -26,10 +26,22 @@ extern FIL gfile;
 extern u32 game_total_NOR;
 extern u32 iTrimSize;
 
+typedef struct
+{
+	u32 art_path_slot;
+	const char *art_path;
+	u8 clear_art_paths;
+} NOR_CatalogPersistContext;
+
 static int NOR_PersistCatalog(void *context)
 {
-	FM_NOR_FS *catalog = (FM_NOR_FS*)context;
-	return Save_NOR_info((u16*)catalog, sizeof(FM_NOR_FS)*MAX_NOR);
+	NOR_CatalogPersistContext *persist = (NOR_CatalogPersistContext*)context;
+
+	if(!persist)
+		return 0;
+	return Save_NOR_info_with_art_path((u16*)pNorFS,
+		sizeof(FM_NOR_FS) * MAX_NOR, persist->art_path_slot,
+		persist->art_path, persist->clear_art_paths);
 }
 
 static u8 NOR_EraseAllPPB(void)
@@ -84,10 +96,48 @@ static u8 NOR_EraseAllPPB(void)
 #define NOR_BLOCK_SIZE     0x00020000UL
 #define NOR_MENU_WIDTH     168
 #define NOR_MENU_CROP_Y    78
-#define NOR_PROGRESS_X     36
-#define NOR_PROGRESS_Y     103
-#define NOR_PROGRESS_W     168
-#define NOR_PROGRESS_H     13
+#define NOR_PROGRESS_X     72
+#define NOR_PROGRESS_Y     104
+#define NOR_PROGRESS_W     96
+#define NOR_PROGRESS_H     8
+#define NOR_PROGRESS_STEPS 16
+#define NOR_VERIFY_PROGRESS_INTERVAL 0x00100000UL
+
+static u32 NOR_ProgressStepCount(u32 count)
+{
+	return count > 64 ? NOR_PROGRESS_STEPS :
+		(count * NOR_PROGRESS_STEPS) / 64;
+}
+
+static void NOR_RestoreStatusWindowBackground(void)
+{
+	const u16 *menu = (const u16*)gImage_MENU;
+	u32 row;
+
+	for(row = 30; row < 90; row++)
+		DrawPic((u16*)(menu + row * NOR_MENU_WIDTH), 36, 25 + row,
+			NOR_MENU_WIDTH, 1, 0, 0, 1);
+}
+
+static void NOR_DrawProgress(u32 count)
+{
+	u32 step;
+	u32 filled = NOR_ProgressStepCount(count);
+	u32 active_step = count % NOR_PROGRESS_STEPS;
+
+	Clear(NOR_PROGRESS_X, NOR_PROGRESS_Y, NOR_PROGRESS_W, NOR_PROGRESS_H,
+		gl_color_selectBG_sd, 1);
+	for(step = 0; step < NOR_PROGRESS_STEPS; step++)
+		if(step < filled && !(filled == NOR_PROGRESS_STEPS && step == active_step))
+			Clear(NOR_PROGRESS_X + step * 6, NOR_PROGRESS_Y, 5,
+				NOR_PROGRESS_H, gl_color_text, 1);
+}
+
+static u32 NOR_ShouldReportEraseProgress(u32 byte_offset)
+{
+	return (byte_offset & (NOR_VERIFY_PROGRESS_INTERVAL - 1)) ==
+		(NOR_VERIFY_PROGRESS_INTERVAL - 2);
+}
 
 static void NOR_RestoreFormatProgressBackground(void)
 {
@@ -178,15 +228,12 @@ u8 Block_Erase(u32 blockAdd) //0x20000 BYTE pre block
 //-----------------------------------------------------------
 static void NOR_ChipEraseProgress(void *context)
 {
-	char msg[128];
 	u32 *count = (u32*)context;
 	VBlankIntrWait();
 	VBlankIntrWait();
 	ShowTime(NOR_list,0);
 	NOR_RestoreFormatProgressBackground();
-
-	itoa(*count,msg,2);
-	DrawHZText12(msg,0,60,NOR_PROGRESS_Y,gl_color_text,1);
+	NOR_DrawProgress(*count);
 	(*count)++;
     VBlankIntrWait();
 }
@@ -221,8 +268,7 @@ u8 Chip_Erase()
 				REG_IME = old_ime;
 				return 0;
 			}
-			/* Keep verifying every word, but redraw only once per 8 MiB bank. */
-			if((byte_offset & 0x007FFFFF) == 0x007FFFFE)
+			if(NOR_ShouldReportEraseProgress(byte_offset))
 				NOR_ChipEraseProgress(&count);
 		}
 	}
@@ -235,6 +281,7 @@ u8 Chip_Erase()
 u8 FormatNor()
 {
 	char msg[128];
+	NOR_CatalogPersistContext persist_context = {0, 0, 1};
 	sprintf(msg,"%s",gl_formatnor_info1);
 
 	DrawHZText12(msg,0,60,90+13,gl_color_text,1);
@@ -245,14 +292,41 @@ u8 FormatNor()
 		scanKeys();
 		u16 keys = keysDown();
 		if (keys & KEY_A) {
+			u16 message_length = DrawText12VisibleLength(gl_formatnor_info2);
+			u16 message_x = (240 - message_length * 6) / 2;
+			NOR_RestoreStatusWindowBackground();
+			// The status panel is only 168 pixels wide. Split the English message
+			// into three centered lines so the full text stays inside its window.
+			if(strcmp(gl_formatnor_info2,
+				"Formatting, this may take some time. Please wait...") == 0)
+			{
+				DrawHZText12("Formatting, this may",0,57,46,gl_color_text,1);
+				DrawHZText12("take some time.",0,75,60,gl_color_text,1);
+				DrawHZText12("Please wait...",0,78,74,gl_color_text,1);
+			}
+			else
+				DrawHZText12(gl_formatnor_info2, message_length, message_x, 82,
+					gl_color_text, 1);
+			NOR_DrawProgress(0);
 			if(!Chip_Erase())
 				return 2;
 			if(!NOR_ClearCatalogAndPersist(pNorFS,
-				sizeof(FM_NOR_FS)*MAX_NOR, NOR_PersistCatalog, pNorFS))
+				sizeof(FM_NOR_FS)*MAX_NOR, NOR_PersistCatalog, &persist_context))
 				return 3;
 			return 1;
 		}
 		else if(keys & KEY_B) {
+			// Consume the cancel press and its release here so NOR_list_MENU
+			// cannot interpret the same B input as its own back action.
+			while(keysHeld() & KEY_B)
+			{
+				VBlankIntrWait();
+				scanKeys();
+			}
+			scanKeys();
+			(void)keysDown();
+			(void)keysUp();
+			(void)keysDownRepeat();
 			return 0;
 		}
 	}
@@ -339,7 +413,8 @@ u8 WriteFlash_with32word(u32 address,u8 *buffer,u32 size)
 	return 1;
 }
 //-----------------------------------------------------------
-u32 Loadfile2NOR(TCHAR *filename, u32 NORaddress,u16 have_patch,u8 SAVEMODE)
+u32 Loadfile2NOR(TCHAR *filename, const TCHAR *rom_dir, u32 NORaddress,
+	u16 have_patch,u8 SAVEMODE)
 {
 	u32 res;
 	u32 result;
@@ -350,34 +425,56 @@ u32 Loadfile2NOR(TCHAR *filename, u32 NORaddress,u16 have_patch,u8 SAVEMODE)
 	u32 read_size;
 	u32 file_open;
 	char msg[128];
+	char source_path[MAX_path_len * 2 + 2];
 	FM_NOR_FS tmpNorFS;
 	FM_NOR_FS previousNorFS;
+	NOR_CatalogPersistContext persist_context;
 	char flag[4];
 	u16 flag_64MBrom;
 	u16 norid;
 	u32 add_patch = 0;
 
 	if(filename == NULL || (NORaddress % NOR_BLOCK_SIZE) != 0)
-		return 1;
+		return NOR_WRITE_RESULT_FILE_ERROR;
 	if(game_total_NOR >= MAX_NOR || NORaddress >= NOR_CAPACITY_BYTES)
-		return 2;
+		return NOR_WRITE_RESULT_FULL;
+	if(filename[0] == '/')
+	{
+		if(strlen(filename) >= sizeof(source_path))
+			return NOR_WRITE_RESULT_FILE_ERROR;
+		strcpy(source_path, filename);
+	}
+	else if(rom_dir && rom_dir[0])
+	{
+		size_t dir_length = strlen(rom_dir);
+		int written = snprintf(source_path, sizeof(source_path), "%s%s%s",
+			rom_dir, rom_dir[dir_length - 1] == '/' ? "" : "/", filename);
+		if(written <= 0 || (size_t)written >= sizeof(source_path))
+			return NOR_WRITE_RESULT_FILE_ERROR;
+	}
+	else
+	{
+		if(strlen(filename) >= sizeof(source_path))
+			return NOR_WRITE_RESULT_FILE_ERROR;
+		strcpy(source_path, filename);
+	}
 
 	norid = Read_S98NOR_ID();
 	if(norid != 0x223D)//S98
-		return 1;
+		return NOR_WRITE_RESULT_DEVICE_ERROR;
 
-	res = f_open(&gfile, filename, FA_READ);
+	res = f_open(&gfile, source_path, FA_READ);
 	if(res != FR_OK)
-		return 1;
+		return NOR_WRITE_RESULT_FILE_ERROR;
 	file_open = 1;
-	result = 1;
+	result = NOR_WRITE_RESULT_FILE_ERROR;
 
 	filesize = f_size(&gfile);
 	if(filesize < 0xB4)
 		goto close_file;
 	if(filesize > NOR_CAPACITY_BYTES)
 	{
-		result = 2;
+		result = NOR_WRITE_RESULT_FULL;
 		goto close_file;
 	}
 
@@ -402,7 +499,7 @@ u32 Loadfile2NOR(TCHAR *filename, u32 NORaddress,u16 have_patch,u8 SAVEMODE)
 	}
 	if(fileneedsize > (NOR_CAPACITY_BYTES - NORaddress))
 	{
-		result = 2; //Not enough NOR space or game slots
+		result = NOR_WRITE_RESULT_FULL; //Not enough NOR space or game slots
 		goto close_file;
 	}
 
@@ -416,7 +513,10 @@ u32 Loadfile2NOR(TCHAR *filename, u32 NORaddress,u16 have_patch,u8 SAVEMODE)
 	tmpNorFS.savemode = SAVEMODE;
 
 	if(!NOR_EraseAllPPB())
+	{
+		result = NOR_WRITE_RESULT_ERASE_ERROR;
 		goto close_file;
+	}
 
 	Clear(60,160-15,120,15,gl_color_cheat_black,1);
 	DrawHZText12(gl_writing,0,70,160-15,0x7fff,1);
@@ -446,32 +546,42 @@ u32 Loadfile2NOR(TCHAR *filename, u32 NORaddress,u16 have_patch,u8 SAVEMODE)
 			GBApatch_Cleanrom_NOR((u32*)pReadCache,blocknum);
 		}
 
-		if(!Block_Erase(blocknum+NORaddress) ||
-		   !WriteFlash_with32word(blocknum+NORaddress,pReadCache,NOR_BLOCK_SIZE))
+		if(!Block_Erase(blocknum+NORaddress))
+		{
+			result = NOR_WRITE_RESULT_ERASE_ERROR;
 			goto close_file;
+		}
+		if(!WriteFlash_with32word(blocknum+NORaddress,pReadCache,NOR_BLOCK_SIZE))
+		{
+			result = NOR_WRITE_RESULT_PROGRAM_ERROR;
+			goto close_file;
+		}
 	}
 
 	if(f_close(&gfile) != FR_OK)
 	{
 		file_open = 0;
-		return 1;
+		return NOR_WRITE_RESULT_FILE_ERROR;
 	}
 	file_open = 0;
 
 	if(have_patch && add_patch)
 	{
 		if(!Block_Erase(blocknum+NORaddress))
-			return 1;
+			return NOR_WRITE_RESULT_ERASE_ERROR;
 		GBApatch_NOR((u32*)pReadCache,NOR_BLOCK_SIZE,blocknum);
 		if(!WriteFlash_with32word(blocknum+NORaddress,pReadCache,NOR_BLOCK_SIZE))
-			return 1;
+			return NOR_WRITE_RESULT_PROGRAM_ERROR;
 	}
 
 	// Publish the new slot only while persistence sees it; restore RAM on failure.
+	persist_context.art_path_slot = game_total_NOR;
+	persist_context.art_path = rom_dir;
+	persist_context.clear_art_paths = 0;
 	if(!NOR_CommitCatalogSlot(&pNorFS[game_total_NOR], &tmpNorFS, &previousNorFS,
-		sizeof(FM_NOR_FS), NOR_PersistCatalog, pNorFS))
-		return 1;
-	return 0;
+		sizeof(FM_NOR_FS), NOR_PersistCatalog, &persist_context))
+		return NOR_WRITE_RESULT_CATALOG_ERROR;
+	return NOR_WRITE_RESULT_OK;
 
 close_file:
 	if(file_open)

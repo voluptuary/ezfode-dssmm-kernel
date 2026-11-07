@@ -1,0 +1,23 @@
+Ezcard_OP.c
+GBApatch.c
+NORflash_OP.c
+RTC.c
+draw.c
+ezkernelnew.c
+helpwindow.c
+lang.c
+setwindow.c
+setwindow2.c
+showcht.c
+diskio.c
+ff.c
+ffsystem.c
+ffunicode.c
+gba_rts_only.s
+gba_rts_patch.s
+gba_sleep_patch.s
+reset.s
+linking cartridge
+built ... omega-de-ds-style-multisystem-kernel.gba
+ROM fixed!
+Kernel image: 2064384 bytes, 32768 bytes below the 2 MiB limit

@@ -1,11 +1,11 @@
 #!/bin/sh
 # Differential test: the enum settings readers in the working tree must behave exactly like the readers in a
-# reference version of source/ezkernelnew.c (default: 83e350d, the last commit with the original per-setting readers). The reader code is extracted verbatim.
+# reference version of source/ezkernelnew.c (default: v8.2.0). The reader code is extracted verbatim.
 # Usage: scripts/test-launcher-enum-settings-host.sh [reference-git-ref [source-file-to-test]]
 set -eu
 
 repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-ref=${1:-83e350d}
+ref=${1:-v8.2.0}
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT HUP INT TERM
 

@@ -1,5 +1,73 @@
 # Changelog
 
+## DS Style Merkin Mix 8.4.1
+
+- Respect the configured Title or Box artwork style in the startup save-recovery popup. Corrected the Box image crop to use an eight-pixel offset rather than eight bytes, preserving the complete centered 32×32 art.
+- Allow GBA header-code artwork lookup when the matching recent entry is unavailable or points to a root-level title; preserve long save basenames for that lookup.
+- Accept 16-bit Title artwork with a zero BMP planes field in the startup save-recovery popup; confirmed on hardware with root-level AGS Aging Cartridge header art (`TCHK`).
+- Distinguish NOR source-file, device, erase, program, and catalog-save failures in the error display.
+- Use string pointers for error messages so longer UTF-8 translations cannot overflow a fixed stack buffer.
+
+## DS Style Merkin Mix 8.4.0
+
+### NOR flash improvements
+
+- Restored translated A/B button hints in NOR menus and confirmation pop-ups.
+- Fixed the format confirmation layout, cancellation flow, and progress display; formatting now shows a centered wait message and an active progress bar.
+- Added a centered wait message while deleting a NOR title and erase every allocated block of the newest title before clearing its catalog entry.
+- Preserved each NOR title's source directory so mirrored artwork works for games stored in nested folders. Filename artwork now falls back through custom art, game-code art, mirrored art, and root-level artwork.
+- Open NOR installation sources through their checked directory path, including games in the SD card root.
+
+## DS Style Merkin Mix 8.3.0
+
+Stable release with the 8.3.0 interface refinements, startup updates, and validated launcher memory-placement improvements.
+
+### Changes since 8.2.0
+
+- Added eased Start-screen corner markers, refined menu sounds and pop-ups, and launch feedback with a loading ring and theme-matched fade.
+- Refined startup so menu preparation can continue while startup audio finishes, without an artificial splash hold.
+- Added the clock-based Auto theme (dark from 20:00 to 08:00), grouped artwork controls under View options, and Open SYSTEM access to support files.
+- Enabled wrap-around browsing and menus by default while preserving saved Off preferences; added **On, Not SYSTEM** for SYSTEM browsing.
+- Added double-tap Select to add or remove a favourite without a confirmation pop-up, and added **Boot to** while keeping the Start screen available.
+- Updated the Saving Game Data popup to show the selected game's box artwork.
+- Fixed Clean list Off in browser titles, aligned help-page headings, and aligned LED setting values.
+- Moved the thumbnail scaling lookup maps into IWRAM and two infrequently used path buffers into EWRAM; preserved a conservative IWRAM-to-IRQ-stack layout margin.
+- Preserved the optional Clean list setting and Remember cheats support.
+
+## DS Style Merkin Mix 8.3.0-rc3 — exploratory test candidate
+
+This is an exploratory test build, not a stable release.
+
+### Changes since 8.3.0-rc2
+
+- Fixed Clean list Off in browser titles: original extensions and bracketed text now remain visible in horizontal and vertical views.
+- Reflowed the “Using DS Style” help topic so each page begins with its section heading and has up to eight description lines.
+- Aligned LED setting values by widening the label column one character.
+
+## DS Style Merkin Mix 8.3.0-rc2 — exploratory test candidate
+
+This is an exploratory test build, not a stable release.
+
+### Changes since 8.3.0-rc1
+
+- Changed the startup Saving Game Data popup to show matching square box artwork instead of title artwork.
+- Added **On, Not SYSTEM** to Wrap around, disabling wrap-around while browsing `/SYSTEM` and its subdirectories.
+- Fixed Clean list Off not taking effect immediately when list rows were cached.
+
+## DS Style Merkin Mix 8.3.0-rc1 — exploratory test candidate
+
+This is an exploratory test build, not a stable release.
+
+### New features since 8.2.0
+
+- Added FrankieT19's eased Start-screen corner-marker movement and refined menu sounds, pop-ups and launch feedback, including a loading ring over selected artwork and a theme-matched fade.
+- Refined FrankieT19's startup presentation so menu preparation can continue while startup audio finishes, without waiting for the full audio clip.
+- Added FrankieT19's clock-based Auto theme, dark from 20:00 to 08:00, grouped artwork controls under View options, and Open SYSTEM access to support files.
+- Enabled FrankieT19's wrap-around browsing and menu navigation defaults while continuing to honor saved Off preferences.
+- Added FrankieT19's double-tap Select shortcut to add or remove a favourite without a confirmation pop-up.
+- Added FrankieT19's Boot to control for the cartridge's startup destination while keeping the existing Start screen available.
+- Added FrankieT19's selected-game artwork to the Saving Game Data presentation.
+
 ## DS Style Merkin Mix 8.2.0
 
 This build includes the v8.1.0 features and fixes, with new carousel and cheat-menu features.

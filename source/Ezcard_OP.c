@@ -15,6 +15,7 @@
 #include "Ezcard_OP.h"
 #include "nor_flash_status.h"
 #include "nor_info_policy.h"
+#include "nor_art_path.h"
 
 //#include "fw.h"
 
@@ -551,6 +552,50 @@ u8 Save_NOR_info(u16 * NOR_info_buffer,u32 buffersize)
 {
 	return Save_info_if_changed(NOR_info_offset, NOR_info_buffer,buffersize,0);
 }
+
+u8 Save_NOR_info_with_art_path(u16 *NOR_info_buffer, u32 buffersize,
+	u32 slot, const char *art_path, u8 clear_art_paths)
+{
+	u32 catalog_size = sizeof(pNorFS);
+	u32 paths_size = MAX_NOR * MAX_path_len;
+	u32 storage_size = buffersize + paths_size;
+	u32 i;
+	u8 *storage = pReadCache;
+	u8 *paths;
+	const volatile u8 *saved_paths;
+
+	if(!NOR_info_buffer || buffersize != catalog_size ||
+		storage_size > MAX_pReadCache_size || storage_size > 0x10000 ||
+		(!clear_art_paths && slot >= MAX_NOR))
+		return 0;
+
+	memcpy(storage, NOR_info_buffer, buffersize);
+	paths = storage + buffersize;
+	if(clear_art_paths)
+		memset(paths, 0, paths_size);
+	else
+	{
+		saved_paths = (const volatile u8*)((const u8*)FlashBase_S71 +
+			NOR_info_offset + buffersize);
+		for(i = 0; i < paths_size; i++)
+			paths[i] = saved_paths[i];
+		NOR_StoreArtPathRecord((char*)paths + slot * MAX_path_len,
+			MAX_path_len, art_path);
+	}
+
+	return Save_info_if_changed(NOR_info_offset, (u16*)storage, storage_size, 0);
+}
+
+const char *Read_NOR_art_path(u32 slot)
+{
+	const char *path;
+
+	if(slot >= MAX_NOR)
+		return "";
+	path = (const char*)((const u8*)FlashBase_S71 + NOR_info_offset +
+		sizeof(pNorFS) + slot * MAX_path_len);
+	return NOR_ValidArtPathRecord(path, MAX_path_len);
+}
 // --------------------------------------------------------------------
 void Save_SET_info(u16 * SET_info_buffer,u32 buffersize)
 {
@@ -719,6 +764,7 @@ void IWRAM_CODE Check_FW_update()
 		sprintf(msg,"Press (B) to skip.");
 		DrawHZText12(msg,0,2,offset_Y+6*line_x, 0x7FFF,1);
 
+        REG_DISPCNT &= (u16)~0x0080;
 		while(1)
 		{
 			VBlankIntrWait();
@@ -769,6 +815,7 @@ void IWRAM_CODE Check_FW_update()
 			}
 		}
 	}
+    REG_DISPCNT |= 0x0080;
 }
 // --------------------------------------------------------------------
 static const u32 crc32tab[] = {

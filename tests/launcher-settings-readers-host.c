@@ -13,6 +13,10 @@
 #endif
 
 typedef unsigned short u16;
+typedef unsigned int u32;
+#define LAUNCHER_WRAP_OFF 0
+#define LAUNCHER_WRAP_ON 1
+#define LAUNCHER_WRAP_EXCEPT_SYSTEM 2
 static u16 launcher_sounds_enabled, launcher_hide_system_files, launcher_list_folders;
 static u16 launcher_clean_list, launcher_wrap_around;
 static unsigned launcher_settings_migration_pending;
@@ -49,7 +53,7 @@ int main(void)
 	static const char *values[] = { "", "On", "on", "ON", "oN", "Off", "off", "OFF", "oFf", "Yes", "yes", "YES",
 		"No", "no", "NO", "1", "0", "10", "01", "1x", "0x", "00", "11", "2", "9", "x", "true", "false",
 		"enabled", "disabled", "On ", " On", "Off ", "O", "Of", "Onn", "Offf", "\xE5\xBC\x80", "\xE5\x85\xB3",
-		"ON_L", "OFF_L", "1on", "0off", "Y", "N", "Yes please", "No thanks", "-1", "+1" };
+		"ON_L", "OFF_L", "1on", "0off", "Y", "N", "Yes please", "No thanks", "-1", "+1", "On, Not SYSTEM" };
 	static const char *on_set[]  = { "On", "\xE5\xBC\x80", "ON_L", "1on", "Yes" };
 	static const char *off_set[] = { "Off", "\xE5\x85\xB3", "OFF_L", "0off", "No" };
 	unsigned r, v, s, d;

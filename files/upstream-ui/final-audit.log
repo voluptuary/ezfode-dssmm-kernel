@@ -1,0 +1,77 @@
+Repository: /workspaces/ezfode-dssmm-kernel
+## exploratory...origin/exploratory
+ M CHANGELOG.md
+ M scripts/test-launcher-artwork-draw-host.sh
+ M scripts/test-launcher-enum-settings-host.sh
+ M scripts/test-launcher-settings-readers-host.sh
+ M source/ezkernelnew.c
+?? files/UPSTREAM_UI_CANDIDATE.md
+?? files/upstream-ui/all-host-suites.log
+?? files/upstream-ui/final-audit.log
+?? files/upstream-ui/final-build.log
+?? scripts/test-launcher-auto-theme-host.sh
+?? scripts/test-launcher-favourite-toggle-host.sh
+?? tests/launcher-auto-theme-host.c
+?? tests/launcher-favourite-toggle-host.c
+
+Found devkitARM compiler:
+arm-none-eabi-gcc (devkitARM) 16.1.0
+GBA rules: /opt/devkitpro/devkitARM/gba_rules
+
+Running production Makefile build (without cleanup)...
+make[1]: '/workspaces/ezfode-dssmm-kernel/ezfode-dssmm-kernel.gba' is up to date.
+
+Running FAT-table capacity regression test...
+FAT table builder host test passed.
+
+Running launcher artwork drawing regression test...
+Artwork drawing matches v8.2.0: final|e4bc9c69|dma_row_copies=2650289
+span|cases=766800|mismatches=0
+
+Running CUSTOM Only artwork style policy regression test...
+Artwork style policy scenarios passed.
+
+Running carousel memory and redraw regression test...
+Carousel install bounds and rest-frame scenarios passed.
+
+Running artwork border rollback regression test...
+Artwork border rollback: 2160 differential cases passed
+
+Running remembered cheat state and collapsed-menu regression test...
+PASS: cheat persistence, failures, identity, bounded selections and collapsed viewport
+
+Running browser installer regression scenarios...
+Browser installer scenarios passed.
+
+Checking JavaScript syntax...
+
+Checking whitespace errors...
+
+Running Cppcheck on modified firmware files...
+Checking source/Ezcard_OP.c ...
+1/4 files checked 3% done
+Checking source/GBApatch.c ...
+Checking source/GBApatch.c: DEBUG...
+2/4 files checked 9% done
+Checking source/ezkernelnew.c ...
+Checking source/ezkernelnew.c: DEBUG...
+Checking source/ezkernelnew.c: LAUNCHER_TOP_BAR_OVERLAY_ENABLED=0...
+3/4 files checked 93% done
+Checking source/showcht.c ...
+4/4 files checked 100% done
+
+Checks completed. Review generated build artifacts and git status; this script does not clean, stage, commit, or push.
+## exploratory...origin/exploratory
+ M CHANGELOG.md
+ M scripts/test-launcher-artwork-draw-host.sh
+ M scripts/test-launcher-enum-settings-host.sh
+ M scripts/test-launcher-settings-readers-host.sh
+ M source/ezkernelnew.c
+?? files/UPSTREAM_UI_CANDIDATE.md
+?? files/upstream-ui/all-host-suites.log
+?? files/upstream-ui/final-audit.log
+?? files/upstream-ui/final-build.log
+?? scripts/test-launcher-auto-theme-host.sh
+?? scripts/test-launcher-favourite-toggle-host.sh
+?? tests/launcher-auto-theme-host.c
+?? tests/launcher-favourite-toggle-host.c

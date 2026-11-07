@@ -1,0 +1,16 @@
+indexed N=30: complete names 0 resolver scans; clipped scan=31 returned entries
+FatFs N=30 last ordinary LFN: opens=1 reads=1 dir_find=2 dir_next=121
+FatFs N=30 missing: opens=1 reads=0 dir_find=2 dir_next=132
+indexed N=60: complete names 0 resolver scans; clipped scan=61 returned entries
+FatFs N=60 last ordinary LFN: opens=1 reads=1 dir_find=2 dir_next=242
+FatFs N=60 missing: opens=1 reads=0 dir_find=2 dir_next=253
+indexed N=90: complete names 0 resolver scans; clipped scan=91 returned entries
+FatFs N=90 last ordinary LFN: opens=1 reads=1 dir_find=2 dir_next=363
+FatFs N=90 missing: opens=1 reads=0 dir_find=2 dir_next=374
+indexed N=120: complete names 0 resolver scans; clipped scan=121 returned entries
+FatFs N=120 last ordinary LFN: opens=1 reads=1 dir_find=2 dir_next=484
+FatFs N=120 missing: opens=1 reads=0 dir_find=2 dir_next=495
+indexed N=240: complete names 0 resolver scans; clipped scan=241 returned entries
+FatFs N=240 last ordinary LFN: opens=1 reads=1 dir_find=2 dir_next=965
+FatFs N=240 missing: opens=1 reads=0 dir_find=2 dir_next=976
+Scaling evidence only: dir_next counts include LFN slots/parents, not SD latency or frame time. No per-move simulation.

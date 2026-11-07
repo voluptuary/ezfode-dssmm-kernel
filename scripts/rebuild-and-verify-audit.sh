@@ -5,8 +5,8 @@ script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 repo_root="$(cd -- "${script_dir}/.." && pwd)"
 cd "$repo_root"
 
-if [[ ! -f KERNEL_AUDIT_PROGRESS.md ]]; then
-	printf 'Audit checkpoint is missing: %s/KERNEL_AUDIT_PROGRESS.md\n' "$repo_root" >&2
+if [[ ! -f progress.md ]]; then
+	printf 'Audit checkpoint is missing: %s/progress.md\n' "$repo_root" >&2
 	exit 1
 fi
 
@@ -63,6 +63,9 @@ printf 'GBA rules: %s/gba_rules\n' "$devkitarm"
 printf '\nRunning production Makefile build (without cleanup)...\n'
 make
 
+printf '\nChecking IWRAM scale-map placement and IRQ-stack margin...\n'
+bash scripts/test-launcher-iwram-placement.sh
+
 printf '\nRunning FAT-table capacity regression test...\n'
 scripts/test-fat-table-builder-host.sh
 
@@ -71,6 +74,33 @@ scripts/test-launcher-artwork-draw-host.sh
 
 printf '\nRunning CUSTOM Only artwork style policy regression test...\n'
 scripts/test-launcher-art-style-policy-host.sh
+
+printf '\nRunning Clean list cache regression test...\n'
+scripts/test-launcher-clean-list-cache-host.sh
+
+printf '\nRunning save-popup artwork regression test...\n'
+scripts/test-save-popup-artwork-host.sh
+
+printf '\nRunning Wrap around SYSTEM-scope regression test...\n'
+scripts/test-launcher-wrap-system-host.sh
+
+printf '\nRunning popup button-hint regression test...\n'
+scripts/test-popup-button-hints-host.sh
+
+printf '\nRunning NOR filename-art fallback regression test...\n'
+scripts/test-nor-thumbnail-fallback-host.sh
+
+printf '\nRunning NOR format progress regression test...\n'
+scripts/test-nor-format-progress-host.sh
+
+printf '\nRunning NOR title deletion regression test...\n'
+scripts/test-nor-delete-title-host.sh
+
+printf '\nRunning NOR write failure classification regression test...\n'
+scripts/test-nor-write-result-host.sh
+
+printf '\nRunning settings readers regression test...\n'
+scripts/test-launcher-settings-readers-host.sh
 
 printf '\nRunning carousel memory and redraw regression test...\n'
 bash scripts/test-carousel-motion-host.sh

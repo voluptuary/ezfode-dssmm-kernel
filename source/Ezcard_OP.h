@@ -26,6 +26,9 @@ u8 IWRAM_CODE Verify_Flash_Erased(vu16 *start, u32 word_count);
 u8 IWRAM_CODE Verify_Flash_Data(vu16 *start, const vu16 *expected, u32 word_count);
 u8 Save_sav_info(u16 * SAV_info_buffer,u32 buffersize);
 u8 Save_NOR_info(u16 * NOR_info_buffer,u32 buffersize);
+u8 Save_NOR_info_with_art_path(u16 *NOR_info_buffer, u32 buffersize,
+	u32 slot, const char *art_path, u8 clear_art_paths);
+const char *Read_NOR_art_path(u32 slot);
 void Save_SET_info(u16 * SET_info_buffer,u32 buffersize);
 void IWRAM_CODE Read_NOR_info();
 u16 IWRAM_CODE Read_SET_info(u32 offset);

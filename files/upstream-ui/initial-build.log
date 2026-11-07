@@ -1,0 +1,8 @@
+Ezcard_OP.c
+draw.c
+ezkernelnew.c
+/workspaces/omega-de-ds-style-multisystem-kernel/source/ezkernelnew.c:722:12: error: only zero initializers are allowed in section '.sbss'
+  722 | static u16 launcher_wrap_around = 1;
+      |            ^~~~~~~~~~~~~~~~~~~~
+make[1]: *** [/opt/devkitpro/devkitARM/base_rules:38: ezkernelnew.o] Error 1
+make: *** [Makefile:128: build] Error 2

@@ -1,0 +1,23 @@
+draw.c
+Ezcard_OP.c
+ezkernelnew.c
+GBApatch.c
+helpwindow.c
+lang.c
+NORflash_OP.c
+RTC.c
+setwindow2.c
+setwindow.c
+showcht.c
+diskio.c
+ff.c
+ffsystem.c
+ffunicode.c
+gba_rts_only.s
+gba_rts_patch.s
+gba_sleep_patch.s
+reset.s
+linking cartridge
+built ... ezfode-dssmm-kernel.gba
+ROM fixed!
+Kernel image: 2009752 bytes, 87400 bytes below the 2 MiB limit

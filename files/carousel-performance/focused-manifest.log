@@ -1,0 +1,7 @@
+manifest differential: 169620 queries, counts 0..256, ascending/reverse/duplicates/small-domain/full-width; canaries PASS
+manifest M=30: 120 misses old=3600 hash probes new=480; cold reverse-sort comparisons=138
+manifest M=60: 120 misses old=7200 hash probes new=600; cold reverse-sort comparisons=357
+manifest M=90: 120 misses old=10800 hash probes new=720; cold reverse-sort comparisons=607
+manifest M=120: 120 misses old=14400 hash probes new=720; cold reverse-sort comparisons=885
+manifest M=256: 120 misses old=30720 hash probes new=960; cold reverse-sort comparisons=2562
+production collection: cap/partial read/empty/open failure/style isolation/invalid-style fallback/warm reuse PASS
